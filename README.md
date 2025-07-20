@@ -51,10 +51,10 @@ Follow these steps in order to get your automated lottery up and running.
 
 3. **Verify the contract:**
 
-   Run the helper script to generate the necessary verification files, passing in the address you just copied:
+   Run the helper script to generate the necessary verification files. The script will prompt you to enter the contract address you just copied.
 
    ```bash
-   npx hardhat run scripts/extract-input.js <YOUR_DEPLOYED_CONTRACT_ADDRESS>
+   npx hardhat run scripts/extract-input.js
    ```
 
    This will create an `output` directory. Open the `output/verify-smart-contracts.md` file and follow the instructions inside to complete verification on the Helios Explorer.

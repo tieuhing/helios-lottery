@@ -1,29 +1,42 @@
 const fs = require("fs");
 const path = require("path");
 const chalk = require("chalk");
-const { network } = require("hardhat");
+const hre = require("hardhat");
 
 async function main() {
   console.log(chalk.yellow("============================================================"));
   console.log(chalk.yellow("        Verification Input Extractor Script        "));
   console.log(chalk.yellow("============================================================\n"));
 
-  // 1. Get Contract Address from command line arguments
-  const contractAddress = process.argv[2];
-  if (!contractAddress) {
-    console.error(chalk.red.bold("❌ Error: Missing contract address."));
-    console.error(chalk.cyan("   Please provide the deployed contract address as an argument:"));
-    console.error(chalk.white("   npx hardhat run scripts/extract-input.js <YOUR_CONTRACT_ADDRESS>\n"));
+  // 1. Prompt for the contract address
+  const readline = require("readline").createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const contractAddress = await new Promise((resolve) => {
+    readline.question(
+      chalk.blue.bold("Please enter the deployed contract address: "),
+      (addr) => {
+        readline.close();
+        resolve(addr);
+      }
+    );
+  });
+
+  // 2. Validate the address
+  if (!hre.ethers.isAddress(contractAddress)) {
+    console.error(chalk.red.bold(`\n❌ Error: Invalid address provided: '${contractAddress}'`));
     process.exit(1);
   }
 
-  console.log(chalk.blue.bold(`▶️  Generating verification files for contract at: ${contractAddress}\n`));
+  console.log(chalk.blue.bold(`\n▶️  Generating verification files for contract at: ${contractAddress}\n`));
 
   const contractName = "AutomatedDailyLottery";
   const buildInfoDir = path.resolve(__dirname, "..", "artifacts", "build-info");
   const outputDir = path.resolve(__dirname, "..", "output");
 
-  // 2. Clean and create the output directory
+  // 3. Clean and create the output directory
   try {
     if (fs.existsSync(outputDir)) {
       fs.rmSync(outputDir, { recursive: true, force: true });
@@ -59,7 +72,7 @@ async function main() {
 
     const buildInfo = JSON.parse(fs.readFileSync(latestBuildFile, "utf8"));
     
-    // 3. Generate and save the verify-input.json
+    // 4. Generate and save the verify-input.json
     const verificationInput = buildInfo.input;
     const outputJsonPath = path.join(outputDir, "verify-input.json");
     fs.writeFileSync(outputJsonPath, JSON.stringify(verificationInput, null, 2));
@@ -67,7 +80,7 @@ async function main() {
     console.log(chalk.green.bold("\n✅  Successfully created verification input file!"));
     console.log(chalk.cyan("   File saved to: ") + chalk.white.bold(outputJsonPath));
 
-    // 4. Create the tutorial markdown file with the contract address
+    // 5. Create the tutorial markdown file
     const explorerUrl = `https://explorer.helioschainlabs.org/address/${contractAddress}`;
     const tutorialContent = `
 # How to Verify Your Smart Contract
