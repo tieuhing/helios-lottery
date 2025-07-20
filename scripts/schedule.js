@@ -3,14 +3,10 @@ const chalk = require("chalk");
 const chronosArtifact = require("../chronos.json");
 
 async function main() {
-  console.log(chalk.cyan.bold("      _  _         _        _   _         _           _   "));
-  console.log(chalk.cyan.bold("     | || |___  __| |___ __| |_| |_ ___  | |__ _ _ __| |_ "));
-  console.log(chalk.cyan.bold("     | __ / _ \/ _` / -_) _|  _|  _/ _ \ | / _` | '_ \  _| "));
-  console.log(chalk.cyan.bold("     |_||_\___/\__,_\___\__|\__|\__\___/ |_\__,_| .__/\__|"));
-  console.log(chalk.cyan.bold("                                               |_|      "));
   console.log(chalk.yellow("============================================================"));
   console.log(chalk.yellow("        Chronos Task Scheduling Script        "));
   console.log(chalk.yellow("============================================================\n"));
+
 
   const lotteryAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS"; // Replace with your contract address
   const chronosAddress = "0x0000000000000000000000000000000000000830";

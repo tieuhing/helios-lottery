@@ -2,14 +2,10 @@ const hre = require("hardhat");
 const chalk = require("chalk");
 
 async function main() {
-  console.log(chalk.cyan.bold("      _  _         _        _   _         _           _   "));
-  console.log(chalk.cyan.bold("     | || |___  __| |___ __| |_| |_ ___  | |__ _ _ __| |_ "));
-  console.log(chalk.cyan.bold("     | __ / _ \/ _` / -_) _|  _|  _/ _ \ | / _` | '_ \  _|"));
-  console.log(chalk.cyan.bold("     |_||_\___/\__,_\___\__|\__|\__\___/ |_\__,_| .__/\__|"));
-  console.log(chalk.cyan.bold("                                               |_|      "));
   console.log(chalk.yellow("============================================================"));
   console.log(chalk.yellow("      Automated Daily Lottery Deployment Script      "));
   console.log(chalk.yellow("============================================================\n"));
+
 
   console.log(chalk.blue.bold("▶️  Starting Deployment...\n"));
 
