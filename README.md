@@ -59,6 +59,10 @@ Your automated lottery is now running! To verify that the Chronos task was sched
 3.  Find the `getCronTaskInfo` function and click "Query".
 4.  You will see the `cronId`, the `cronWallet` address, and the `cronWalletBalance` (which should be 1 HLS). This confirms the task is scheduled and funded.
 
+Successfully deploying and scheduling a task with Chronos earns you XP on the Helios Testnet!
+
+![Chronos Deploy Achievement](./chronos-deploy-achievements.png)
+
 ---
 
 ## Tutorial: Building From Scratch
