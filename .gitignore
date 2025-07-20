@@ -1,0 +1,15 @@
+# Node
+node_modules
+npm-debug.log*
+yarn-error.log
+
+# Hardhat
+.env
+coverage
+coverage.json
+typechain-types
+cache
+artifacts
+
+# Custom
+helios-docs
