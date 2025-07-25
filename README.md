@@ -155,184 +155,92 @@ Now, we'll configure Hardhat to connect to the Helios Testnet.
 
 2. **Update `hardhat.config.js`:**
 
-   Replace the content of your `hardhat.config.js` file with the following:
+# 🎰 Helios Lottery dApp
 
-   ```javascript
-   require("@nomicfoundation/hardhat-toolbox");
-   require("dotenv").config();
+This project is a decentralized lottery system deployed on the [Helios Testnet](https://github.com/helios-network), where a winner is automatically picked every 24 hours using [Chronos](https://docs.helios.org/chronos/intro), the Helios-native scheduling engine.
 
-   /** @type import('hardhat/config').HardhatUserConfig */
-   module.exports = {
-     solidity: "0.8.30",
-     networks: {
-       helios_testnet: {
-         url: "https://testnet1.helioschainlabs.org",
-         chainId: 42000,
-         accounts: [process.env.PRIVATE_KEY],
-       },
-     },
-   };
-   ```
+## ✨ Features
 
-### Step 3: The Smart Contract
+* ✅ Fully on-chain lottery
+* ✅ Scheduled execution every 24 hours using Chronos
+* ✅ Written in Solidity + Hardhat
+* ✅ Deployed and scheduled successfully on Helios Testnet
 
-Now, let's write the `AutomatedDailyLottery` smart contract.
+---
 
-Delete the sample `Lock.sol` file in the `contracts` directory and create a new file named `AutomatedDailyLottery.sol` with the following content:
+## 🛠 Tech Stack
 
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+* Solidity (smart contracts)
+* Hardhat (deployment & testing)
+* Chronos (task scheduler on Helios)
 
-contract AutomatedDailyLottery {
-    address[] public players;
-    uint256 public ticketPrice;
-    address public chronosServiceAddress;
-    address public owner;
+---
 
-    // Chronos Task Info
-    uint256 public cronId;
-    address public cronWallet;
+## 📁 Project Structure
 
-    event LotteryEnter(address indexed player);
-    event WinnerPaid(address indexed winner, uint256 amount);
-    event CronTaskSet(uint256 indexed cronId, address indexed cronWallet);
-
-    struct CronTaskInfo {
-        uint256 cronId;
-        address cronWallet;
-        uint256 cronWalletBalance;
-    }
-
-    modifier onlyChronos() {
-        require(msg.sender == chronosServiceAddress, "Only Chronos service can call this function");
-        _;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "You are not the owner.");
-        _;
-    }
-
-    constructor(uint256 _ticketPrice, address _chronosServiceAddress) {
-        owner = msg.sender;
-        ticketPrice = _ticketPrice;
-        chronosServiceAddress = _chronosServiceAddress;
-    }
-
-    function enter() public payable {
-        require(msg.value >= ticketPrice, "Not enough HLS to enter");
-        players.push(msg.sender);
-        emit LotteryEnter(msg.sender);
-    }
-
-    function drawWinner() public onlyChronos {
-        require(players.length > 0, "No players in the lottery");
-        uint256 totalAmount = address(this).balance;
-        
-        uint256 winnerIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, players))) % players.length;
-        address payable winner = payable(players[winnerIndex]);
-
-        (bool success, ) = winner.call{value: totalAmount}("");
-        require(success, "Failed to send money");
-
-        emit WinnerPaid(winner, totalAmount);
-
-        players = new address[](0);
-    }
-
-    function setCronTaskDetails(uint256 _cronId, address _cronWallet) public onlyOwner {
-        cronId = _cronId;
-        cronWallet = _cronWallet;
-        emit CronTaskSet(_cronId, _cronWallet);
-    }
-
-    function getCronTaskInfo() public view returns (CronTaskInfo memory) {
-        return CronTaskInfo({
-            cronId: cronId,
-            cronWallet: cronWallet,
-            cronWalletBalance: cronWallet.balance
-        });
-    }
-
-    function getPlayers() public view returns (address[] memory) {
-        return players;
-    }
-
-    function getBalance() public view returns (uint256) {
-        return address(this).balance;
-    }
-}
+```
+helios-lottery/
+├── contracts/             # Smart contracts (Lottery.sol)
+├── scripts/               # Deployment and scheduling scripts
+├── test/                  # Unit tests
+├── chronos.json           # Chronos task configuration
+├── hardhat.config.js      # Hardhat setup
+└── .env                   # Contains PRIVATE_KEY and RPC for Helios
 ```
 
-### Step 4: The Helper Scripts
+---
 
-This project uses three main scripts located in the `scripts/` directory to manage the DApp's lifecycle. If you've cloned this repository, these files are already created for you.
+## 🚀 Deployment Steps
 
-1. **`scripts/deploy.js`**: This script handles the deployment of the `AutomatedDailyLottery` smart contract to the blockchain. It logs the new contract address upon successful deployment.
+### 1. Clone and install
 
-2. **`scripts/extract-input.js`**: After deployment, this script generates the necessary files for contract verification on the Helios Explorer. It takes the deployed contract address as an argument and creates a `verify-input.json` file and a `verify-smart-contracts.md` tutorial in the `output/` directory.
+```bash
+git clone https://github.com/tieuhing/helios-lottery
+cd helios-lottery
+npm install
+```
 
-3. **`scripts/schedule.js`**: This script interacts with the Chronos precompile to schedule the daily execution of the `drawWinner` function. You will need to edit this file to insert your deployed contract's address before running it.
+### 2. Configure `.env`
 
-### Step 5: Compile and Deploy
+```env
+PRIVATE_KEY=your_private_key
+RPC_URL=https://rpc-testnet.helios.org
+```
 
-1. **Compile the contract:**
+### 3. Deploy contract
 
-   ```bash
-   npx hardhat compile
-   ```
+```bash
+npx hardhat run scripts/deploy.js --network helios_testnet
+```
 
-2. **Deploy the contract:**
+### 4. Schedule task with Chronos
 
-   ```bash
-   npx hardhat run scripts/deploy.js --network helios_testnet
-   ```
+```bash
+npx hardhat run scripts/schedule.js --network helios_testnet
+```
 
-   After running the deploy command, **copy the deployed contract address**. You will need it for the next two steps.
+---
 
-### Step 6: Verify the Contract on the Explorer
+## 📸 Achievements
 
-Verifying your contract is a crucial step that builds trust and enables UI interaction.
+* ✅ Contract successfully deployed to Helios Testnet
+* ✅ Task scheduled with Chronos
+* ✅ GitHub repo ready for Helios Experience Pack submission
 
-1. **Generate Verification Files:**
+![Smart contract verified](./smart-contracts-verified.png)
+![Chronos deployed](./chronos-deploy-achievements.png)
 
-   Run the `extract-input.js` script, passing your newly deployed contract address as an argument:
+---
 
-   ```bash
-   npx hardhat run scripts/extract-input.js <YOUR_DEPLOYED_CONTRACT_ADDRESS>
-   ```
+## 🧠 Author
 
-2. **Follow the Verification Tutorial:**
+* **tieuhing**
+* Helios wallet: `YOUR_WALLET_ADDRESS`
+* GitHub: [https://github.com/tieuhing](https://github.com/tieuhing)
 
-   The script will create an `output` directory. Open the `output/verify-smart-contracts.md` file and follow the detailed, step-by-step instructions to complete the verification process on the Helios Explorer.
+---
 
-### Step 7: Scheduling the Automated Task
+## 🏱 Submission for Helios Experience Pack
 
-Now that your contract is deployed and verified, you can schedule the `drawWinner` function to run automatically.
+This project is part of the **"Helios Experience Pack - Build with Chronos"** to earn **10,000 XP** from Helios Testnet.
 
-1. **Update and Run the Scheduling Script:**
-   * Open `scripts/schedule.js` and replace the placeholder `YOUR_DEPLOYED_CONTRACT_ADDRESS` with your actual contract address.
-   * Execute the script:
-
-     ```bash
-     npx hardhat run scripts/schedule.js --network helios_testnet
-     ```
-
-### Step 8: Verifying the Chronos Task
-
-Thanks to the `getCronTaskInfo` function in our contract, verifying the scheduled task is simple.
-
-1. Go to the [Helios Explorer](https://explorer.helioschainlabs.org) and search for your deployed lottery contract address.
-2. Go to the **"Read Contract"** tab.
-3. Find the `getCronTaskInfo` function and click "Query".
-4. The explorer will show you the results:
-   * `cronId`: The unique ID of your task. A non-zero value proves it's scheduled.
-   * `cronWallet`: The address of the dedicated wallet created to pay for the task's execution.
-   * `cronWalletBalance`: The amount of HLS held by the cron wallet to pay for future gas fees. This should be `1000000000000000000` (which is 1 HLS in wei).
-
-This provides definitive, on-chain proof that your task is scheduled and funded. After 24 hours, you can also check the "Events" tab on the explorer for a `WinnerPaid` event to confirm the execution was successful.
-
-### Conclusion
-
-Congratulations! You have successfully built, deployed, verified, and scheduled an automated daily lottery on the Helios blockchain. You have learned how to use Hardhat, interact with precompiles like Chronos, and create a user-friendly DApp that provides on-chain verification of its automated components.

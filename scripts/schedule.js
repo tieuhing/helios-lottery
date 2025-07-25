@@ -8,7 +8,7 @@ async function main() {
   console.log(chalk.yellow("============================================================\n"));
 
 
-  const lotteryAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS"; // Replace with your contract address
+  const lotteryAddress = "0xd122570DD51185335Cd9a7002EE7ad859e1667B5"; // Replace with your contract address
   const chronosAddress = "0x0000000000000000000000000000000000000830";
 
   if (lotteryAddress === "YOUR_DEPLOYED_CONTRACT_ADDRESS") {
